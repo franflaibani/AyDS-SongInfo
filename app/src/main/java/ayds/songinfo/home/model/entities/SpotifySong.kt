@@ -9,10 +9,55 @@ sealed class Song {
         val releaseDate: String,
         val spotifyUrl: String,
         val imageUrl: String,
+        val releaseDatePrecision: String,
         var isLocallyStored: Boolean = false
     ) : Song() {
 
-        val year: String = releaseDate.split("-").first()
+        val precisedDate = getPrecisionDate(releaseDate, releaseDatePrecision)
+
+        private fun getPrecisionDate(releaseDate: String, releaseDatePrecision: String): String {
+            when (releaseDatePrecision) {
+                "day" -> {return releaseDate.split("-").reversed().toString()}
+                "month" -> {return getMonthDate(releaseDate)}
+                "year" -> {return getYearDate(releaseDate)}
+            }
+            return ""
+        }
+
+        private fun getYearDate(releaseDate: String): String {
+            val year = releaseDate.toInt()
+            return when (leapYear(year)) {
+                true -> "$year (a leap year)"
+                false -> "$year (not a leap year)"
+            }
+        }
+
+        private fun leapYear(year: Int): Boolean {
+            return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+        }
+
+        private fun getMonthDate(releaseDate: String): String {
+            val year = releaseDate.split("-").first()
+            val month = getMonthName(releaseDate.split("-").last())
+            return "$month, $year"
+        }
+
+        private fun getMonthName(month: String): String {
+            return when (month){
+                "01" -> "January"
+                "02" -> "February"
+                "03" -> "March"
+                "04" -> "April"
+                "05" -> "May"
+                "06" -> "June"
+                "07" -> "July"
+                "08" -> "August"
+                "09" -> "September"
+                "10" -> "October"
+                "11" -> "November"
+                else -> "December"
+            }
+        }
     }
 
     object EmptySong : Song()
