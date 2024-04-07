@@ -17,11 +17,19 @@ sealed class Song {
 
         private fun getPrecisionDate(releaseDate: String, releaseDatePrecision: String): String {
             when (releaseDatePrecision) {
-                "day" -> {return releaseDate.split("-").reversed().toString()}
+                "day" -> {return getDayDate(releaseDate)}
                 "month" -> {return getMonthDate(releaseDate)}
                 "year" -> {return getYearDate(releaseDate)}
             }
-            return ""
+            return "date not found"
+        }
+
+        private fun getDayDate(releaseDate: String): String {
+            val date = releaseDate.split("-")
+            val day = date[2]
+            val month = date[1]
+            val year = date[0]
+            return "$day/$month/$year"
         }
 
         private fun getYearDate(releaseDate: String): String {
