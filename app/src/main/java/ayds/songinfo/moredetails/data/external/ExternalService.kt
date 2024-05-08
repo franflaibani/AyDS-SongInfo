@@ -1,15 +1,20 @@
 package ayds.songinfo.moredetails.data.external
 
-interface ExternalService {
+import ayds.songinfo.moredetails.domain.entities.Biography
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import java.io.IOException
 
+interface ExternalService {
+    fun getArticleFromService(artistName: String): Biography.ArtistBiography
 }
 
-internal class ExternalServiceImpl: ExternalService {
+internal class ExternalServiceImpl(
+    private val lastFMAPI: LastFMAPI
+): ExternalService {
+     override fun getArticleFromService(artistName: String): Biography.ArtistBiography {
 
-    /*
-     private fun getArticleFromService(artistName: String): ArtistBiography {
-
-        var artistBiography = ArtistBiography(artistName, "", "")
+        var artistBiography = Biography.ArtistBiography(artistName, "", "")
         try {
             val callResponse = getSongFromService(artistName)
             artistBiography = getArtistBioFromExternalData(callResponse.body(), artistName)
@@ -23,7 +28,7 @@ internal class ExternalServiceImpl: ExternalService {
     private fun getArtistBioFromExternalData(
         serviceData: String?,
         artistName: String
-    ): ArtistBiography {
+    ): Biography.ArtistBiography {
         val gson = Gson()
         val jobj = gson.fromJson(serviceData, JsonObject::class.java)
 
@@ -33,10 +38,9 @@ internal class ExternalServiceImpl: ExternalService {
         val url = artist["url"]
         val text = extract?.asString ?: "No Results"
 
-        return ArtistBiography(artistName, text, url.asString)
+        return Biography.ArtistBiography(artistName, text, url.asString)
     }
 
     private fun getSongFromService(artistName: String) =
         lastFMAPI.getArtistInfo(artistName).execute()
-     */
 }

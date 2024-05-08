@@ -3,37 +3,27 @@ package ayds.songinfo.moredetails.data
 import ayds.songinfo.moredetails.data.external.ExternalService
 import ayds.songinfo.moredetails.data.local.LocalStorage
 import ayds.songinfo.moredetails.domain.BiographyRepository
-import ayds.songinfo.moredetails.fulllogic.ArtistBiography
+import ayds.songinfo.moredetails.domain.entities.Biography
 
 internal class BiographyRepositoryImpl(
     private val externalService: ExternalService,
     private val localStorage: LocalStorage
 ) : BiographyRepository {
 
-    override fun getArtistInfoFromRepository(): ArtistBiography {
-        TODO("Not yet implemented")
-    }
-
-    /*
-    private fun getArtistInfoFromRepository(): ArtistBiography {
-        val artistName = getArtistName()
-
-        val dbArticle = getArticleFromDB(artistName)
-
-        val artistBiography: ArtistBiography
+    override fun getArtistInfoFromRepository(artistName: String): Biography {
+        val dbArticle = localStorage.getArticleFromDB(artistName)
+        val artistBiography: Biography
 
         if (dbArticle != null) {
             artistBiography = dbArticle.markItAsLocal()
         } else {
-            artistBiography = getArticleFromService(artistName)
+            artistBiography = externalService.getArticleFromService(artistName)
             if (artistBiography.biography.isNotEmpty()) {
-                insertArtistIntoDB(artistBiography)
+                localStorage.insertArtistIntoDB(artistBiography)
             }
         }
         return artistBiography
     }
 
-    private fun getArtistName() =
-        intent.getStringExtra(ARTIST_NAME_EXTRA) ?: throw Exception("Missing artist name")
-     */
+    private fun Biography.ArtistBiography.markItAsLocal() = copy(biography = "[*]$biography")
 }
