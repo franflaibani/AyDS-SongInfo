@@ -1,29 +1,32 @@
 package ayds.songinfo.moredetails.data
 
-import ayds.songinfo.moredetails.data.external.ExternalService
-import ayds.songinfo.moredetails.data.local.LocalStorage
-import ayds.songinfo.moredetails.domain.BiographyRepository
-import ayds.songinfo.moredetails.domain.entities.Biography
+import ayds.songinfo.moredetails.data.external.OtherInfoService
+import ayds.songinfo.moredetails.data.local.OtherInfoLocalStorage
+import ayds.songinfo.moredetails.domain.entities.ArtistBiography
+import ayds.songinfo.moredetails.domain.OtherInfoRepository
 
-internal class BiographyRepositoryImpl(
-    private val externalService: ExternalService,
-    private val localStorage: LocalStorage
-) : BiographyRepository {
+internal class OtherInfoRepositoryImpl(
+    private val otherInfoLocalStorage: OtherInfoLocalStorage,
+    private val otherInfoService: OtherInfoService,
+) : OtherInfoRepository {
 
-    override fun getArtistInfoFromRepository(artistName: String): Biography {
-        val dbArticle = localStorage.getArticleFromDB(artistName)
-        val artistBiography: Biography
+    override fun getArtistInfo(artistName: String): ArtistBiography {
+        val dbArticle = otherInfoLocalStorage.getArticle(artistName)
+
+        val artistBiography: ArtistBiography
 
         if (dbArticle != null) {
-            artistBiography = dbArticle.markItAsLocal()
+            artistBiography = dbArticle.apply { markItAsLocal() }
         } else {
-            artistBiography = externalService.getArticleFromService(artistName)
+            artistBiography = otherInfoService.getArticle(artistName)
             if (artistBiography.biography.isNotEmpty()) {
-                localStorage.insertArtistIntoDB(artistBiography)
+                otherInfoLocalStorage.insertArtist(artistBiography)
             }
         }
         return artistBiography
     }
 
-    private fun Biography.ArtistBiography.markItAsLocal() = copy(biography = "[*]$biography")
+    private fun ArtistBiography.markItAsLocal() {
+        isLocallyStored = true
+    }
 }
