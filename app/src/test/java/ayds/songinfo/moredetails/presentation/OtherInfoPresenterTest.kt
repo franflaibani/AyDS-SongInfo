@@ -11,26 +11,35 @@ import org.junit.Test
 
 class OtherInfoPresenterTest {
 
-    private val repository: OtherInfoRepository = mockk()
+    private val otherInfoRepository: OtherInfoRepository = mockk()
     private val artistBiographyDescriptionHelper:
-            ArtistBiographyDescriptionHelper = mockk(relaxUnitFun = true)
-
+            ArtistBiographyDescriptionHelper = mockk()
     private val otherInfoPresenter: OtherInfoPresenter = OtherInfoPresenterImpl(
-        repository, artistBiographyDescriptionHelper
+        otherInfoRepository, artistBiographyDescriptionHelper
     )
 
-    //¿Is it OK to use artistBiography on subscribe? "IT" DOESN'T WORK.
     @Test
-    fun `getArtistInfo should get info and notify the result`(){
-        val artistBiography: ArtistBiography = mockk()
-        every { repository.getArtistInfo("artistName") } returns artistBiography
-        val artistBiographyTester: (ArtistBiography) -> Unit = mockk(relaxed = true)
-        otherInfoPresenter.artistBiographyObservable.subscribe {
-            artistBiographyTester(artistBiography)
-        }
+    fun `getArtistInfo should return the artist biography ui state`(){
+        val artistBiography = ArtistBiography(
+            "artistName",
+            "biography",
+            "articleUrl"
+        )
+        every { otherInfoRepository.getArtistInfo("artistName") } returns artistBiography
+        every { artistBiographyDescriptionHelper.getDescription(artistBiography) }returns "description"
+        val artistBiographyTester: (ArtistBiographyUiState) -> Unit = mockk(relaxed = true)
 
+        otherInfoPresenter.artistBiographyObservable.subscribe {
+            artistBiographyTester(it)
+        }
         otherInfoPresenter.getArtistInfo("artistName")
 
-        verify { artistBiographyTester(artistBiography) }
+        val result = ArtistBiographyUiState(
+            "artistName",
+            "description",
+            "articleUrl"
+        )
+
+        verify { artistBiographyTester(result) }
     }
 }
