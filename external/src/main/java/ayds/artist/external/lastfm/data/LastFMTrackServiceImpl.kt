@@ -1,19 +1,18 @@
-package ayds.songinfo.moredetails.data.external
+package ayds.artist.external.lastfm.data
 
-import ayds.songinfo.moredetails.domain.entities.ArtistBiography
 import java.io.IOException
 
-interface OtherInfoService {
-    fun getArticle(artistName: String): ArtistBiography
+interface LastFMTrackService {
+    fun getArticle(artistName: String): LastFMArticle?
 }
-internal class OtherInfoServiceImpl(
+internal class LastFMTrackServiceImpl(
     private val lastFMAPI: LastFMAPI,
     private val lastFMToArtistBiographyResolver: LastFMToArtistBiographyResolver
-) : OtherInfoService {
+) : LastFMTrackService {
 
-    override fun getArticle(artistName: String): ArtistBiography {
+    override fun getArticle(artistName: String): LastFMArticle? {
 
-        var artistBiography = ArtistBiography(artistName, "", "")
+        var artistBiography: LastFMArticle? = null
         try {
             val callResponse = getSongFromService(artistName)
             artistBiography = lastFMToArtistBiographyResolver.map(callResponse.body(), artistName)

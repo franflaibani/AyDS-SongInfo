@@ -1,32 +1,32 @@
 package ayds.songinfo.moredetails.data
 
-import ayds.songinfo.moredetails.data.external.OtherInfoService
+import ayds.artist.external.lastfm.data.LastFMTrackService
 import ayds.songinfo.moredetails.data.local.OtherInfoLocalStorage
-import ayds.songinfo.moredetails.domain.entities.ArtistBiography
+import ayds.songinfo.moredetails.domain.entities.Card
 import ayds.songinfo.moredetails.domain.OtherInfoRepository
 
 internal class OtherInfoRepositoryImpl(
     private val otherInfoLocalStorage: OtherInfoLocalStorage,
-    private val otherInfoService: OtherInfoService,
+    private val lastFMTrackService: LastFMTrackService,
 ) : OtherInfoRepository {
 
-    override fun getArtistInfo(artistName: String): ArtistBiography {
+    override fun getArtistInfo(artistName: String): Card {
         val dbArticle = otherInfoLocalStorage.getArticle(artistName)
 
-        val artistBiography: ArtistBiography
+        val card: Card
 
         if (dbArticle != null) {
-            artistBiography = dbArticle.apply { markItAsLocal() }
+            card = dbArticle.apply { markItAsLocal() }
         } else {
-            artistBiography = otherInfoService.getArticle(artistName)
-            if (artistBiography.biography.isNotEmpty()) {
-                otherInfoLocalStorage.insertArtist(artistBiography)
+            card = lastFMTrackService.getArticle(artistName)
+            if (card.biography.isNotEmpty()) {
+                otherInfoLocalStorage.insertArtist(card)
             }
         }
-        return artistBiography
+        return card
     }
 
-    private fun ArtistBiography.markItAsLocal() {
+    private fun Card.markItAsLocal() {
         isLocallyStored = true
     }
 }
