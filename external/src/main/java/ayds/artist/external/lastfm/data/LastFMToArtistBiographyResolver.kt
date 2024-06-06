@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 
 interface LastFMToArtistBiographyResolver {
-    fun map(serviceData: String?, artistName: String): LastFMArticle?
+    fun map(serviceData: String?, artistName: String): LastFMArticle
 }
 
 private const val ARTIST = "artist"
@@ -18,7 +18,7 @@ internal class LastFMToArtistBiographyResolverImpl : LastFMToArtistBiographyReso
     override fun map(
         serviceData: String?,
         artistName: String
-    ): LastFMArticle? {
+    ): LastFMArticle {
         val gson = Gson()
 
         val jasonObject = gson.fromJson(serviceData, JsonObject::class.java)
@@ -27,8 +27,8 @@ internal class LastFMToArtistBiographyResolverImpl : LastFMToArtistBiographyReso
         val bio = artist[BIO].getAsJsonObject()
         val extract = bio[CONTENT]
         val url = artist[URL]
-        val text = extract?.asString ?: null
+        val text = extract?.asString ?: NO_RESULTS
 
-        return text?.let{ LastFMArticle(artistName, text, url.asString) }
+        return LastFMArticle(artistName, text, url.asString)
     }
 }

@@ -1,15 +1,12 @@
 package ayds.songinfo.moredetails.presentation
 
 import ayds.songinfo.moredetails.domain.entities.Card
-import io.mockk.every
-import io.mockk.mockk
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class CardDescriptionHelperTest {
 
-    private val artistBiographyDescriptionHelper = ArtistBiographyDescriptionHelperImpl()
+    private val artistBiographyDescriptionHelper = CardDescriptionHelperImpl()
 
     @Test
     fun `given a local artist it should return the biography` () {

@@ -4,31 +4,42 @@ import ayds.observer.Observable
 import ayds.observer.Subject
 import ayds.songinfo.moredetails.domain.entities.Card
 import ayds.songinfo.moredetails.domain.OtherInfoRepository
+import java.util.LinkedList
 
 interface OtherInfoPresenter {
-    val artistBiographyObservable: Observable<ArtistBiographyUiState>
+    val artistBiographyObservable: Observable<CardsUiState>
     fun getArtistInfo(artistName: String)
 
 }
 
 internal class OtherInfoPresenterImpl(
     private val repository: OtherInfoRepository,
-    private val artistBiographyDescriptionHelper: ArtistBiographyDescriptionHelper
+    private val cardDescriptionHelper: CardDescriptionHelper
 ) : OtherInfoPresenter {
 
-    override val artistBiographyObservable = Subject<ArtistBiographyUiState>()
+    override val artistBiographyObservable = Subject<CardsUiState>()
 
     override fun getArtistInfo(artistName: String) {
-        val artistBiography = repository.getArtistInfo(artistName)
+        val infoCards = repository.getInfoCards(artistName)
 
-        val uiState = artistBiography.toUiState()
+        val uiState = infoCards.toUiState()
 
         artistBiographyObservable.notify(uiState)
     }
 
-    private fun Card.toUiState() = ArtistBiographyUiState(
-        artistName,
-        artistBiographyDescriptionHelper.getDescription(this),
-        articleUrl
-    )
+    private fun LinkedList<Card>.toUiState(): CardsUiState {
+        val cardsUiState = CardsUiState(LinkedList<CardUiState>())
+        this.forEach {
+            cardsUiState.cards.addLast(
+                CardUiState(
+                    it.artistName,
+                    cardDescriptionHelper.getDescription(it),
+                    it.url,
+                    it.source.toString(),
+                    it.sourceLogoUrl
+                )
+            )
+        }
+        return cardsUiState
+    }
 }

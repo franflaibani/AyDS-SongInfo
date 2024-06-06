@@ -1,28 +1,50 @@
 package ayds.songinfo.moredetails.data.local
 
 import ayds.songinfo.moredetails.domain.entities.Card
+import ayds.songinfo.moredetails.domain.entities.CardSource
+import java.util.LinkedList
 
 interface OtherInfoLocalStorage {
-    fun getArticle(artistName: String): Card?
-    fun insertArtist(card: Card)
+    fun getCard(artistName: String): Card?
+    fun saveCard(card: Card)
+
+    fun getCards(artistName: String): LinkedList<Card>
 }
 
 internal class OtherInfoLocalStorageImpl(
-    private val articleDatabase: ArticleDatabase,
+    private val cardDatabase: CardDatabase,
 ) : OtherInfoLocalStorage {
 
-    override fun getArticle(artistName: String): Card? {
-        val artistEntity = articleDatabase.ArticleDao().getArticleByArtistName(artistName)
-        return artistEntity?.let {
-            Card(artistName, artistEntity.biography, artistEntity.articleUrl)
+    override fun getCard(artistName: String): Card? {
+        val cardEntity = cardDatabase.CardDao().getArticleByArtistName(artistName)
+        return cardEntity?.let {
+            Card(artistName, cardEntity.biography, cardEntity.articleUrl,
+                CardSource.entries[cardEntity.source], cardEntity.sourceLogoUrl)
         }
     }
 
-    override fun insertArtist(card: Card) {
-        articleDatabase.ArticleDao().insertArticle(
-            ArticleEntity(
-                card.artistName, card.biography, card.articleUrl
+    override fun saveCard(card: Card) {
+        cardDatabase.CardDao().saveCard(
+            CardEntity(
+                card.artistName, card.text, card.url, card.source.ordinal, card.sourceLogoUrl
             )
         )
+    }
+
+    override fun getCards(artistName: String): LinkedList<Card> {
+        val list = cardDatabase.CardDao().getCardList(artistName)
+        val cardList = LinkedList<Card>()
+        list.forEach {
+            cardList.addLast(
+                Card(
+                    it.artistName,
+                    it.biography,
+                    it.articleUrl,
+                    CardSource.entries[it.source],
+                    it.sourceLogoUrl
+                )
+            )
+        }
+        return cardList
     }
 }

@@ -13,9 +13,17 @@ import ayds.songinfo.moredetails.injector.OtherInfoInjector
 import com.squareup.picasso.Picasso
 
 class OtherInfoActivity : Activity() {
-    private lateinit var articleTextView: TextView
-    private lateinit var openUrlButton: Button
-    private lateinit var lastFMImageView: ImageView
+    private lateinit var cardTextView1: TextView
+    private lateinit var openUrlButton1: Button
+    private lateinit var logoImageView1: ImageView
+
+    private lateinit var cardTextView2: TextView
+    private lateinit var openUrlButton2: Button
+    private lateinit var logoImageView2: ImageView
+
+    private lateinit var cardTextView3: TextView
+    private lateinit var openUrlButton3: Button
+    private lateinit var logoImageView3: ImageView
 
     private lateinit var presenter: OtherInfoPresenter
 
@@ -42,31 +50,57 @@ class OtherInfoActivity : Activity() {
     }
 
     private fun initViewProperties() {
-        articleTextView = findViewById(R.id.textPane1)
-        openUrlButton = findViewById(R.id.openUrlButton)
-        lastFMImageView = findViewById(R.id.lastFMImageView)
+        cardTextView1 = findViewById(R.id.textPane1)
+        openUrlButton1 = findViewById(R.id.openUrlButton1)
+        logoImageView1 = findViewById(R.id.logoImageView1)
+
+        cardTextView2 = findViewById(R.id.textPane2)
+        openUrlButton2 = findViewById(R.id.openUrlButton2)
+        logoImageView2 = findViewById(R.id.logoImageView2)
+
+        cardTextView3 = findViewById(R.id.textPane3)
+        openUrlButton3 = findViewById(R.id.openUrlButton3)
+        logoImageView3 = findViewById(R.id.logoImageView3)
     }
 
     private fun getArtistInfoAsync() {
         Thread {
-            getArtistInfo()
+            getArtistCard()
         }.start()
     }
 
-    private fun getArtistInfo() {
+    private fun getArtistCard() {
         val artistName = getArtistName()
         presenter.getArtistInfo(artistName)
     }
 
-    private fun updateUi(uiState: ArtistBiographyUiState) {
+    private fun updateUi(uiState: CardsUiState) {
         runOnUiThread {
-            updateOpenUrlButton(uiState.articleUrl)
-            updateLastFMLogo(uiState.imageUrl)
-            updateArticleText(uiState.infoHtml)
+            uiState.cards.getOrNull(0)?.let { updateCard1(it) }
+            uiState.cards.getOrNull(1)?.let { updateCard2(it) }
+            uiState.cards.getOrNull(2)?.let { updateCard3(it) }
         }
     }
 
-    private fun updateOpenUrlButton(url: String) {
+    private fun updateCard1(card: CardUiState) {
+        updateOpenUrlButton(openUrlButton1, card.url)
+        updateImageLogo(logoImageView1, card.articleUrlLogo)
+        updateCardText(cardTextView1, card.html)
+    }
+
+    private fun updateCard2(card: CardUiState) {
+        updateOpenUrlButton(openUrlButton2, card.url)
+        updateImageLogo(logoImageView2, card.articleUrlLogo)
+        updateCardText(cardTextView2, card.html)
+    }
+
+    private fun updateCard3(card: CardUiState) {
+        updateOpenUrlButton(openUrlButton3, card.url)
+        updateImageLogo(logoImageView3, card.articleUrlLogo)
+        updateCardText(cardTextView3, card.html)
+    }
+
+    private fun updateOpenUrlButton(openUrlButton: Button, url: String) {
         openUrlButton.setOnClickListener {
             navigateToUrl(url)
         }
@@ -78,15 +112,15 @@ class OtherInfoActivity : Activity() {
         startActivity(intent)
     }
 
-    private fun updateLastFMLogo(url: String) {
-        Picasso.get().load(url).into(lastFMImageView)
+    private fun updateImageLogo(sourceImageView: ImageView, url: String) {
+        Picasso.get().load(url).into(sourceImageView)
     }
 
     private fun getArtistName() =
         intent.getStringExtra(ARTIST_NAME_EXTRA) ?: throw Exception("Missing artist name")
 
-    private fun updateArticleText(infoHtml: String) {
-        articleTextView.text = Html.fromHtml(infoHtml)
+    private fun updateCardText(cardContentTextView: TextView, infoHtml: String) {
+        cardContentTextView.text = Html.fromHtml(infoHtml)
     }
 
     companion object {

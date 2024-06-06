@@ -5,16 +5,15 @@ import ayds.songinfo.moredetails.domain.entities.Card
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Before
 import org.junit.Test
 
 class OtherInfoPresenterTest {
 
     private val otherInfoRepository: OtherInfoRepository = mockk()
-    private val artistBiographyDescriptionHelper:
-            ArtistBiographyDescriptionHelper = mockk()
+    private val cardDescriptionHelper:
+            CardDescriptionHelper = mockk()
     private val otherInfoPresenter: OtherInfoPresenter = OtherInfoPresenterImpl(
-        otherInfoRepository, artistBiographyDescriptionHelper
+        otherInfoRepository, cardDescriptionHelper
     )
 
     @Test
@@ -24,16 +23,16 @@ class OtherInfoPresenterTest {
             "biography",
             "articleUrl"
         )
-        every { otherInfoRepository.getArtistInfo("artistName") } returns card
-        every { artistBiographyDescriptionHelper.getDescription(card) }returns "description"
-        val artistBiographyTester: (ArtistBiographyUiState) -> Unit = mockk(relaxed = true)
+        every { otherInfoRepository.getInfoCards("artistName") } returns card
+        every { cardDescriptionHelper.getDescription(card) }returns "description"
+        val artistBiographyTester: (CardUiState) -> Unit = mockk(relaxed = true)
 
         otherInfoPresenter.artistBiographyObservable.subscribe {
             artistBiographyTester(it)
         }
         otherInfoPresenter.getArtistInfo("artistName")
 
-        val result = ArtistBiographyUiState(
+        val result = CardUiState(
             "artistName",
             "description",
             "articleUrl"

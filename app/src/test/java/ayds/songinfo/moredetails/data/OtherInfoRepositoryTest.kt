@@ -26,9 +26,9 @@ class OtherInfoRepositoryTest {
             "url",
             false
         )
-        every { otherInfoLocalStorage.getArticle("artist") } returns card
+        every { otherInfoLocalStorage.getCard("artist") } returns card
 
-        val result = otherInfoRepository.getArtistInfo("artist")
+        val result = otherInfoRepository.getInfoCards("artist")
 
         Assert.assertEquals(card, result)
         Assert.assertTrue(result.isLocallyStored)
@@ -42,10 +42,10 @@ class OtherInfoRepositoryTest {
             "url",
             false
         )
-        every { otherInfoLocalStorage.getArticle("artist") } returns null
+        every { otherInfoLocalStorage.getCard("artist") } returns null
         every { otherInfoService.getArticle("artist") } returns card
 
-        val result = otherInfoRepository.getArtistInfo("artist")
+        val result = otherInfoRepository.getInfoCards("artist")
 
         Assert.assertEquals(card, result)
         Assert.assertTrue(result.isLocallyStored)
@@ -59,13 +59,13 @@ class OtherInfoRepositoryTest {
             "url",
             false
         )
-        every { otherInfoLocalStorage.getArticle("artist") } returns null
+        every { otherInfoLocalStorage.getCard("artist") } returns null
         every { otherInfoService.getArticle("artist") } returns card
 
-        val result = otherInfoRepository.getArtistInfo("artist")
+        val result = otherInfoRepository.getInfoCards("artist")
 
         Assert.assertEquals(card, result)
         Assert.assertFalse(result.isLocallyStored)
-        verify(inverse = true) { otherInfoLocalStorage.insertArtist(card) }
+        verify(inverse = true) { otherInfoLocalStorage.saveCard(card) }
     }
 }
